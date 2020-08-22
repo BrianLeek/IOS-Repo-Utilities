@@ -18,6 +18,7 @@ To run the script run the following commend:
 ```
 python main_app.py
 ```
+Before running the script go into `config.py` and edit the options as needed.
 
 ## To Do
  - Package DEB files
