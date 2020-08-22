@@ -1,0 +1,7 @@
+{
+	"name": "Test Tweak",
+	"desc_short": 'A simple test tweak with a short description.',
+	"changelog": "<strong>1.0</strong><br>+ Initial Release<br>",
+	"screenshot": "<div style='text-align:center;'><a href='#' target='_blank'><img width=95% src='#'/></a></div>",
+	"open": true,
+}

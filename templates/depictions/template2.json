@@ -1,0 +1,105 @@
+{
+   "minVersion": "0.1",
+   "class": "DepictionTabView",
+   "tintColor": "Tint Color",
+   "headerImage": "Header Image URL",
+   "tabs": [
+      {
+         "tabname": "Details",
+         "class": "DepictionStackView",
+         "tintColor": "Tint Color",
+         "views": [
+            {
+               "class": "DepictionSubheaderView",
+               "useBoldText": true,
+               "useBottomMargin": false,
+               "title": "Description"
+            },
+            {
+               "class": "DepictionMarkdownView",
+               "markdown": "<p>Package Description<\/p>",
+               "useRawFormat": true
+            },
+            {
+               "class": "DepictionSubheaderView",
+               "useBoldText": true,
+               "useBottomMargin": false,
+               "title": ""
+            },
+            {
+               "class": "DepictionScreenshotsView",
+               "itemCornerRadius": 6,
+               "itemSize": "{160, 284.44444444444}",
+               "screenshots": [
+                  {
+                     "accessibilityText": "Screenshot",
+                     "url": "Screenshot URL 1",
+                     "fullSizeURL": "Screenshot URL 1"
+                  }
+               ]
+            },
+            {
+               "class": "DepictionSeparatorView"
+            },
+            {
+               "class": "DepictionSubheaderView",
+               "useBoldText": true,
+               "useBottomMargin": false,
+               "title": "Information"
+            },
+            {
+               "class": "DepictionTableTextView",
+               "title": "Author",
+               "text": "Package Developer"
+            },
+            {
+               "class": "DepictionTableTextView",
+               "title": "Version",
+               "text": "Latest Version Number"
+            },
+            {
+               "class": "DepictionTableTextView",
+               "title": "Price",
+               "text": "Package Price"
+            },
+            {
+               "class": "DepictionSpacerView",
+               "spacing": 16
+            },
+            {
+               "class": "DepictionStackView",
+               "views": [
+                  {
+                     "class": "DepictionTableButtonView",
+                     "title": "Support",
+                     "action": "Support URL",
+                     "openExternal": true
+                  }
+               ]
+            },
+            {
+               "class": "DepictionSpacerView",
+               "spacing": 16
+            }
+         ]
+      },
+      {
+         "tabname": "Changelog",
+         "class": "DepictionStackView",
+         "tintColor": "Tint Color",
+         "views": [
+            {
+               "class": "DepictionSubheaderView",
+               "useBoldText": true,
+               "useBottomMargin": false,
+               "title": "Version Number"
+            },
+            {
+               "class": "DepictionMarkdownView",
+               "markdown": "<ul>\n<li>Version Changes<\/li>\n<\/ul>",
+               "useRawFormat": true
+            }
+         ]
+      }
+   ]
+}

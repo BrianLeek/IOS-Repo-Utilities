@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Screenshots</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+ 
+  <script type="text/javascript" src="js/jquery.querystring.js"></script>
+  <script type="text/javascript" src="js/data-loader-engine.js"></script>
+  <script type="text/javascript" src="js/ios_version_check.js"></script>
+   <script type="text/javascript" src="js/content-blocks-screenshots.js"></script>
+  <script type="text/javascript">
+
+	bundleid = $.QueryString['p'];
+
+	var contentBlocks = getContentBlocks();
+
+    $( document ).ready(function() {
+		//return;
+		populateContentBlocks(
+			(bundleid+"/info.xml"),
+			contentBlocks,
+			() => {
+                $("#packageError").show();
+				$("#packageInformation").hide();				
+			},
+			(xml) => {
+				document.title = $(xml).find("package>name").text();
+			}
+		)
+
+    }); // ready
+  </script>
+</head>
+<body>
+<br />
+
+<div id="packageInformation">
+	<div class="container">
+		<h5>SCREENSHOTS</h5>
+		<ul id="screenshotsList" class="list-group">
+		</ul>
+	</div>
+</div>
+<div id="packageError" style="display:none">
+	<div class="container">
+	  <div class="alert alert-danger">
+		<strong>Oh snap!</strong> The package you are trying to view is not hosted on this repository. 
+	  </div>
+	</div>
+</div>
+<!-- REPO FOOTER -->
+<script type="text/javascript">
+    var repoContents = 	{
+		"#repoFooterLinks" : 
+			{"type":"custom"
+				,"source":"repo>footerlinks>link"
+				,"render":function(element,source) {
+					$.each(source, function(index,data) {
+						var a = $("<a class='link-item list-group-item'>");
+						a.attr("href",$(data).find('url').text());
+						if ($(data).find('iconclass')) {
+							var i =  $("<span>")
+							i.attr("class",$(data).find('iconclass').text());
+							console.log(i);
+							$(a).append(i);
+						} 
+						$(a).append($(data).find('name').text());
+						$(element).append(a);
+					}); //each
+				} //render
+			}
+	}
+    $( document ).ready(function() {
+        $.ajax({type: "GET", dataType: "xml",url : ("../repo.xml"),cache: false,
+            success : function(xml){
+				data_loader_engine(repoContents,xml);
+				if (navigator.userAgent.search(/Cydia/) != -1) {
+					$("a").each(function() {
+						console.log($(this).text());
+						$(this).attr("target","_blank");
+					});
+				}
+			},
+            error: function() {$("#contactInfo").hide()}
+        }); //ajax
+		
+		
+    }); // ready
+
+</script>
+
+<div id="contactInfo">
+	<div class="container">
+		<h5>CONTACT</h5>
+		<ul class="list-group" id="repoFooterLinks">
+		</ul>
+	</div>
+</div>
+<!-- REPO FOOTER ENDS -->
+
+</body>
+</html>

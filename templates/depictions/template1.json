@@ -1,0 +1,94 @@
+{
+  "minVersion": "0.1",
+  "headerImage": "Header Image URL",
+  "tintColor": "Tint Color",
+  "tabs": [
+    {
+      "tabname": "Details",
+      "views": [
+        {
+          "title": "Package Name",
+          "useBoldText": true,
+          "useBottomMargin": false,
+          "class": "DepictionSubheaderView"
+        },
+        {
+          "itemCornerRadius": 6,
+          "itemSize": "{160, 275.41333333333336}",
+          "screenshots": [
+            {
+              "accessibilityText": "Screenshot",
+              "url": "Screenshot URL 1",
+              "fullSizeURL": "Screenshot URL 1"
+            }
+          ],
+          "class": "DepictionScreenshotsView"
+        },
+        {
+          "markdown": "Package Description",
+          "useSpacing": true,
+          "class": "DepictionMarkdownView"
+        },
+        {
+          "class": "DepictionSeparatorView"
+        },
+        {
+          "title": "Latest Version",
+          "class": "DepictionHeaderView"
+        },
+        {
+          "title": "Version",
+          "text": "Latest Version Number",
+          "class": "DepictionTableTextView"
+        },
+        {
+          "title": "Released",
+          "text": "Latest Release Date",
+          "class": "DepictionTableTextView"
+        },
+        {
+          "title": "Price",
+          "text": "Package Price",
+          "class": "DepictionTableTextView"
+        },
+        {
+          "title": "Developer",
+          "text": "Package Developer",
+          "class": "DepictionTableTextView"
+        },
+        {
+          "title": "Contact Support",
+          "action": "Support URL",
+          "class": "DepictionTableButtonView"
+        },
+        {
+          "spacing": 16,
+          "class": "DepictionSpacerView"
+        },
+        {
+          "spacing": 20,
+          "class": "DepictionSpacerView"
+        }
+      ],
+      "class": "DepictionStackView"
+    },
+    {
+      "tabname": "Changelog",
+      "views": [
+		{
+          "title": "Version Number",
+          "useBoldText": true,
+          "useBottomMargin": true,
+          "class": "DepictionSubheaderView"
+        },
+        {
+          "markdown": "\t\n\u2022 Version Changes",
+          "useSpacing": false,
+          "class": "DepictionMarkdownView"
+        }
+      ],
+      "class": "DepictionStackView"
+    }
+  ],
+  "class": "DepictionTabView"
+}

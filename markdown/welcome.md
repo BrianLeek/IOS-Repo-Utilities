@@ -1,0 +1,3 @@
+
+# IOS Repo Utilities 0.1 BETA By Brian Leek (https://brianleek.me/)
+**IOS Repo Utilities** provides a few tools to help IOS jailbreak developers who run a repo or for people looking to create a repo. Want a create a "Packages" file, then compress it so its ready to use instantly? Well, create a new folder called "debs", copy your .deb files there and run the script. Want to create a whole repo without messing with files? Now you can, run the script and choose to use a template or not and the script will walk you through the rest, like creating a "Release" and "Packages" files, etc. You can even create depictions for Sileo (https://getsileo.app/).
