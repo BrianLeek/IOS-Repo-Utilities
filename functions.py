@@ -1,10 +1,13 @@
+from datetime import datetime
 from shutil import copyfile
 from rich.console import Console
 from rich.markdown import Markdown
 from rich import print
+from datetime import date
 from main_app import *
 import os, sys, errno, bz2
 import pyinputplus as pyip
+import subprocess
 import hashlib
 import config
 import errno
@@ -23,16 +26,13 @@ def releasequestions(): # Ask the user a series of questions then store that dat
     global repo_origin, repo_label, repo_suite, repo_version, repo_codename, repo_architecture, repo_components, repo_description
 
     repo_origin = pyip.inputStr("Repo Name: ")
-    repo_label = pyip.inputStr("Label:* ", blank=True)
-    if repo_label == "":
-        repo_label = repo_origin
+    #repo_label = pyip.inputStr("Label:* ", blank=True)
+    #if repo_label == "":
+    #    repo_label = repo_origin
+    repo_label = repo_origin
     repo_suite = config.RepoSuite
-    repo_version = pyip.inputFloat("Version:* ", blank=True)
-    if repo_version == "":
-        repo_version = config.RepoVersion
-    repo_codename = pyip.inputStr("Codename (default: ios):* ", blank=True)
-    if repo_codename == "":
-        repo_codename = config.RepoCodeName
+    repo_version = config.RepoVersion
+    repo_codename = config.RepoCodeName
     repo_architecture = config.RepoArchitecture
     repo_components = config.RepoComponents
     repo_description = pyip.inputStr("Description: ")
@@ -78,7 +78,7 @@ def debquestions(): # Ask the user a series of questions then store that data to
     deb_package_md5hash = md5hash
     deb_package_sha1hash = sha1hash
     deb_package_sha256hash = sha256hash
-    architecture = "iphoneos-arm"
+    architecture = config.RepoArchitecture
     filename = f"./debs/{deb_file_name}"
 
     print(" ")
@@ -94,7 +94,7 @@ def controlquestions(): # Ask the user a series of questions then store that dat
     control_section = pyip.inputStr("Section:* ", blank=True)
     if control_section == "":
         control_section = config.PackageSection
-    control_larchitecture = config.RepoArchitecture
+    control_architecture = config.RepoArchitecture
     control_description = pyip.inputStr("Description: ")
     control_author = config.Author
     control_maintainer = config.Maintainer
@@ -158,6 +158,142 @@ Homepage: {control_homepage}
 
     print(control_data)
     return(control_data)
+
+def reposign_cleanup():
+    # Delete old files or folders for repo signing.
+    if os.path.exists("Release.gpg"):
+        os.remove("Release.gpg")
+    if os.path.exists("InRelease"):
+        os.remove("InRelease")
+    if os.path.exists("keyring/DEBIAN/control"):
+        os.remove("keyring/DEBIAN/control")
+    if os.path.exists("keyring/DEBIAN/md5sums"):
+        os.remove("keyring/DEBIAN/md5sums")
+
+
+def signrepo():
+    global stop_script_error
+
+    proceed = input("""Proceeding will delete the following files or folders:
+
+ - Release.gpg
+ - InRelease
+ - control
+ - md5sums
+
+Would you like to proceed? (y/n): """)
+
+    print('\nNote: If you have old hashes in your "Release" file please remove them along with the date field. The script will readd it once ran, if not removed it can lead to errors.')
+
+    if proceed == "y":
+        reposign_cleanup()
+
+        # Check if the needed files to sign the repo exists, then get the needed hashes and sizes.
+        if os.path.exists("Release") and os.path.exists("Packages") and os.path.exists("Packages.bz2"):
+            release2hash = "Release"
+            releasemd5result = hashlib.md5(release2hash.encode())
+            releasesha256result = hashlib.sha256(release2hash.encode())
+            releasesha1result = hashlib.sha1(release2hash.encode())
+            releasesha512result = hashlib.sha512(release2hash.encode())
+            releasemd5hash = releasemd5result.hexdigest()
+            releasesha256hash = releasesha256result.hexdigest()
+            releasesha1hash = releasesha1result.hexdigest()
+            releasesha512hash = releasesha512result.hexdigest()
+            releasesize = os.path.getsize("Release")
+
+            packages2hash = "Packages"
+            packagesmd5result = hashlib.md5(packages2hash.encode())
+            packagessha256result = hashlib.sha256(packages2hash.encode())
+            packagessha1result = hashlib.sha1(packages2hash.encode())
+            packagessha512result = hashlib.sha512(packages2hash.encode())
+            packagesmd5hash = packagesmd5result.hexdigest()
+            packagessha256hash = packagessha256result.hexdigest()
+            packagessha1hash = packagessha1result.hexdigest()
+            packagessha512hash = packagessha512result.hexdigest()
+            packagessize = os.path.getsize("Packages")
+
+            packagesbz22hash = "Packages.bz2"
+            packagesbz2md5result = hashlib.md5(packagesbz22hash.encode())
+            packagesbz2sha256result = hashlib.sha256(packagesbz22hash.encode())
+            packagesbz2sha1result = hashlib.sha1(packagesbz22hash.encode())
+            packagesbz2sha512result = hashlib.sha512(packagesbz22hash.encode())
+            packagesbz2md5hash = packagesbz2md5result.hexdigest()
+            packagesbz2sha256hash = packagesbz2sha256result.hexdigest()
+            packagesbz2sha1hash = packagesbz2sha1result.hexdigest()
+            packagesbz2sha512hash = packagesbz2sha512result.hexdigest()
+            packagesbz2size = os.path.getsize("Packages.bz2")
+
+            # Add the hashes and name to a variable to be used later.
+            reposign_data = f"""MD5Sum:
+{packagesmd5hash}            {packagessize} {packages2hash}
+{packagesbz2md5hash}            {packagesbz2size} {packagesbz22hash}
+{releasemd5hash}            {releasesize} {release2hash}
+SHA1:
+{packagessha1hash}            {packagessize} {packages2hash}
+{packagesbz2sha1hash}            {packagesbz2size} {packagesbz22hash}
+{releasesha1hash}            {releasesize} {release2hash}
+SHA256:
+{packagessha256hash}            {packagessize} {packages2hash}
+{packagesbz2sha256hash}            {packagesbz2size} {packagesbz22hash}
+{releasesha256hash}            {releasesize} {release2hash}
+SHA512:
+{packagessha512hash}            {packagessize} {packages2hash}
+{packagesbz2sha512hash}            {packagesbz2size} {packagesbz22hash}
+{releasesha512hash}            {releasesize} {release2hash}
+    """
+
+            # If the file "Release.gpg" isn't found then run the script create it.
+            if not os.path.exists("Release.gpg"):
+                subprocess.call("sign.sh", shell=True)
+
+            # If the file "key.gpg" isn't found then run the script create it.
+            if not os.path.exists(f"{config.GPGKeyringFileName}/etc/apt/trusted.gpg.d/key.gpg"):
+                subprocess.call("gen_key_gpg.sh", shell=True)
+
+            today = date.today()
+            date1 = today.strftime("%Y.%m.%d")
+
+            control_data = f"""Package: {config.GPGKeyringFileName}
+Version: {date1}
+Essential: yes
+Architecture: {config.RepoArchitecture}
+Maintainer: {config.Maintainer}
+Section: System
+Priority: required
+Description: {config.GPGRepoDescription}
+Name: {config.GPGRepoName}
+Tag: purpose::backend, role::hacker
+"""
+
+            # Append the date then the hashes to the "Release" file.
+            with open("Release", "a") as f:
+                print("\nAdding date and hashes to Release file ...")
+                date_now = datetime.now()
+                date_time = date_now.strftime("%a %d %b %Y %H:%M:%S " + datetime.now(timezone.utc).astimezone().strftime('%z'))
+                release_date = f.write(f"\nDate: {date_time}\n")
+                signdata = f.write(reposign_data)
+                print("Done adding hashes and date to Release file.\n")
+
+                f.close()
+
+            # Write the control data to the "control" file.
+            with open(f"{config.GPGKeyringFileName}/DEBIAN/control", "w") as f:
+                f.write(control_data)
+                f.close()
+
+            keyring2hash = f"{config.GPGKeyringFileName}/etc/apt/trusted.gpg.d/key.gpg" # Find the GPG key file.
+            keyringmd5result = hashlib.md5(keyring2hash.encode()) # Get the hash.
+            keyringmd5hash = keyringmd5result.hexdigest() # Get the hash and add to variable.
+            md5sums_data = f"{keyringmd5hash}  keyring/etc/apt/trusted.gpg.d/key.gpg" # Add the data to a variable to add to the "md5sums" file.
+
+            # Write the md5sums data to the "md5sums" file.
+            with open(f"{config.GPGKeyringFileName}/DEBIAN/md5sums", "w") as f:
+                f.write(md5sums_data)
+                f.close()
+    else:
+        stop_script_error = 'FileNotFoundError: The script could not find the needed files. Please make sure you have "Packages", "Packages.bz2", and "Release" files uploaded to the root of the scrips folder.'
+        stop_script()
+
 
 ###################################################
 #     # #   Repo Generator Functions              #

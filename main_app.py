@@ -6,6 +6,18 @@ import pyinputplus as pyip
 import sileo_depiction_generator
 import config
 
+####################
+# Thanks to everybody who has contributed to IOS Repo Utilities so far!
+#
+# Brian Leek - Developer (https://brianleek.me/)
+# Shuga - Contributed Code (https://shuga.co/)
+#   - Provided setup.sh file along with util/gpg.batchgen.
+#   - Provided some tips and recommendations.
+# @KatriCameron - Contributed Code (https://twitter.com/KatriCameron)
+#   - Helped with adding GPG signing.
+#   - Helped with some questions I had.
+####################
+
 console = Console()
 
 def mainappfunc():
@@ -38,7 +50,7 @@ def mainappfunc():
 
     createdebsfolder()
 
-    options = input("1. Generate Release file\n2. Generate/Add to Packages file\n3. Compress Package File\n4. Generate control file\n5. Generate Sileo Depiction (possibly outdated but works)\n6. Generate repo from scratch or template\n7. ZIP to DEB (coming soon)\n8. DEB to ZIP (coming soon)\n\nPlease choose a option by entering the number: ")
+    options = input("1. Generate Release File\n2. Generate/Add to Packages File\n3. Compress Package File\n4. Generate Control File\n5. Generate Sileo Depiction (possibly outdated but works)\n6. Generate Repo\n7. Sign Repo (GPG)\n8. ZIP to DEB (coming soon)\n9. DEB to ZIP (coming soon)\n\nPlease choose a option by entering the number: ")
     print(" ")
 
     if options == "1":
@@ -89,8 +101,8 @@ def mainappfunc():
 
             compress_packages_file()
         else:
-            stop_script_error = '\nFileNotFoundError: "Packages" file could not be found. Make sure it is uploaded to the root folder of the script and try again.'
-            stop_script()
+            stop_script_error = 'FileNotFoundError: "Packages" file could not be found. Make sure it is uploaded to the root folder of the script and try again.'
+            sys.exit(f"{stop_script_error}")
     elif options == "4":
         # Ask the user for data for the control file, then ask if they want to export it or not.
         controlquestions()
@@ -127,9 +139,12 @@ def mainappfunc():
             createrepoquestions()
             createrepo()
     elif options == "7":
-        pass
+        signrepo()
     elif options == "8":
         pass
+    elif options == "9":
+        pass
+
     elif options == "docs":
         clear_console()
         docstextfunc()
